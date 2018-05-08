@@ -4,8 +4,29 @@ import VideoScreen from './screens/video';
 import SettingsScreen from './screens/settings';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { StackNavigator } from 'react-navigation';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
 
 console.disableYellowBox = true;
+
+const initial_state = {
+  region: 'FR'
+};
+
+function reducer(state = initial_state, action) {
+  switch (action.type) {
+    case 'NEW_REGION':
+      return Object.assign({}, state,{ region: action.payload.region })
+    case 'CLEAR_REGION':
+      return Object.assign({}, state,{ region: []})
+    case 'INIT_REGION':
+      return Object.assign({}, state,{ region: action.payload.region})
+    default:
+      return state
+  }
+}
+
+const store = createStore(reducer);
 
 const RootStack = StackNavigator(
   {
@@ -18,7 +39,8 @@ const RootStack = StackNavigator(
 export default class App extends React.Component {
     render() {
         return (
+          <Provider store={store}>
             <RootStack />
-        )
+          </Provider>        )
     }
 }
