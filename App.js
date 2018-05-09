@@ -10,17 +10,19 @@ import { createStore } from 'redux';
 console.disableYellowBox = true;
 
 const initial_state = {
-  region: 'FR'
+  region: ''
 };
 
 function reducer(state = initial_state, action) {
   switch (action.type) {
     case 'NEW_REGION':
-      return Object.assign({}, state,{ region: action.payload.region })
+      return {
+        region: action.payload.region
+      }
     case 'CLEAR_REGION':
-      return Object.assign({}, state,{ region: []})
-    case 'INIT_REGION':
-      return Object.assign({}, state,{ region: action.payload.region})
+      return {
+        region: 'FR'
+      }
     default:
       return state
   }

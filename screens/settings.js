@@ -8,12 +8,12 @@ const YOUTUBE = CONFIG.YOUTUBE;
 const STORAGE = CONFIG.STORAGE;
 
 class SettingsScreen extends React.Component {
-  state = { regions: '', regionsList: [] }
+  state = { region: '', regionsList: [] }
 
   updateRegion = (region) => {
     AsyncStorage.setItem(STORAGE.CURRENT_REGION, region).then(() => {
-      this.setState({region: region})
-      this.props.dispatch({ type: 'NEW_REGIONS', payload: { region: region } })
+      this.setState({region})
+      this.props.dispatch({ type: 'NEW_REGION', payload: {region} })
     })
   }
 
@@ -46,6 +46,7 @@ class SettingsScreen extends React.Component {
         <Picker selectedValue={this.state.region} onValueChange={this.updateRegion}>
           {items}
         </Picker>
+        <Text>{this.props.region}</Text>
       </View>
     )
   }
@@ -53,7 +54,7 @@ class SettingsScreen extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    regionsList: state.regionsList
+    region: state.region
   }
 }
 

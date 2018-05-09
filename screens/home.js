@@ -26,38 +26,45 @@ class HomeScreen extends React.Component {
       ),
     }
   };
-  video = (id,title) => {
+
+  goToWebView = (id,title) => {
      let link = "https://www.youtube.com/watch?v="+id;
      this.props.navigation.navigate("video", {link,title} )
    };
-
-  componentWillMount(){
+   callApi = (region) =>{
+     const url = `${YOUTUBE.BASE_URL}/search?key=${YOUTUBE.API_KEY}&chart=mostPopular&maxResults=10&order=rating&part=snippet`
+     fetch(`${url}&regionCode=${region}`)
+     .then(res => res.json())
+     .then(res => {
+       const videos = []
+       res.items.forEach(item => { videos.push(item) })
+       this.setState({ videoList: videos })
+       return;
+     })
+   }
+  componentDidMount(){
     try{
       AsyncStorage.getItem(STORAGE.CURRENT_REGION).then((result) => {
         if (result) {
-          const region = JSON.parse(result);
-          this.props.dispatch({ type: 'INIT_REGION', payload: { region } })
+          this.props.dispatch({ type: 'NEW_REGION', payload: { region : result } })
+          this.callApi(result)
         }
         else {
           const region = 'FR';
-          this.props.dispatch({ type: 'INIT_REGION', payload: { region } })
+          this.props.dispatch({ type: 'NEW_REGION', payload: { region } })
+          this.callApi( region)
         }
       })
-    } catch(error){ console.log(error); }
-    var url = `${YOUTUBE.BASE_URL}/search?key=${YOUTUBE.API_KEY}&chart=mostPopular&maxResults=10&order=rating&part=snippet`
-    fetch(`${url}&regionCode=${this.props.region}`)
-    .then(res => res.json())
-    .then(res => {
-      const videos = []
-      res.items.forEach(item => { videos.push(item) })
-      this.setState({ videoList: videos })
-    })
+    }
+    catch(error) {
+      console.log(error);
+    }
   }
 
   render() {
     const items = this.state.videoList.map((item, index) => {
       return(
-        <TouchableOpacity style={styles.container} onPress={() => this.video(item.id.videoId,item.snippet.title)}>
+        <TouchableOpacity style={styles.container} onPress={() => this.goToWebView(item.id.videoId,item.snippet.title)}>
           <Image style={{width:350, height: 200,resizeMode:'cover'}} source={{uri:item.snippet.thumbnails.high.url}}/>
           <Text>{item.snippet.title}</Text>
         </TouchableOpacity>
@@ -71,10 +78,11 @@ class HomeScreen extends React.Component {
     )
   }
 
-  componentDidUpdate(){
-    console.log('didUpdate');
+  static getDerivedStateFromProps(next_props, prev_state) {}
+  componentDidUpdate(prev_props, prev_state) {
+    this.callApi(prev_props.region);
+    return null;
   }
-
 }
 
 function mapStateToProps(state) {
