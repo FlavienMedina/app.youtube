@@ -17,7 +17,7 @@ class HomeScreen extends React.Component {
     return {
       headerTitle: 'Youtube',
       headerStyle: {
-        backgroundColor: '#FF0000',
+        backgroundColor: '#FFF',
       },
       headerRight: (
         <TouchableOpacity>
@@ -32,6 +32,7 @@ class HomeScreen extends React.Component {
      this.props.navigation.navigate("video", {link,title} )
    };
    callApi = (region) =>{
+     console.log(region);
      const url = `${YOUTUBE.BASE_URL}/search?key=${YOUTUBE.API_KEY}&chart=mostPopular&maxResults=10&order=rating&part=snippet`
      fetch(`${url}&regionCode=${region}`)
      .then(res => res.json())
@@ -64,15 +65,15 @@ class HomeScreen extends React.Component {
   render() {
     const items = this.state.videoList.map((item, index) => {
       return(
-        <TouchableOpacity style={styles.container} onPress={() => this.goToWebView(item.id.videoId,item.snippet.title)}>
-          <Image style={{width:350, height: 200,resizeMode:'cover'}} source={{uri:item.snippet.thumbnails.high.url}}/>
-          <Text>{item.snippet.title}</Text>
+        <TouchableOpacity style={styles.items} onPress={() => this.goToWebView(item.id.videoId,item.snippet.title)}>
+          <Image style={styles.image} source={{uri:item.snippet.thumbnails.high.url}}/>
+          <Text style={styles.title}>{item.snippet.title}</Text>
         </TouchableOpacity>
       )
     })
     return (
-      <ScrollView>
-        <Text>Popular videos of {this.props.region}</Text>
+      <ScrollView style={styles.container}>
+        <Text style={styles.text}>Popular videos of {this.props.region}</Text>
         {items}
       </ScrollView>
     )
@@ -95,19 +96,24 @@ export default connect(mapStateToProps)(HomeScreen)
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    marginTop: 50,
+  },
+  image: {
+    width:350,
+    height: 200,
+    resizeMode:'cover',
+    marginBottom:10
   },
   items: {
-    marginTop: 10,
-    backgroundColor: '#C42E2F',
-    padding: 20,
-    width: '90%'
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom:10,
   },
-  item: {
-    width: '100%',
-    fontSize: 15
+  text: {
+    textAlign:'center',
+  },
+  title: {
+    textAlign:'center',
+    fontSize:12
   },
 });
